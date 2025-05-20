@@ -34,15 +34,15 @@ export const createAiSlice: StateCreator<AiSlice> = (set, get) => ({
         supports && get().useReasoning
       );
 
-      for await (const part of stream as AsyncIterable<any>) {
-        // Solo procesamos text-delta y reasoning
-        if (part.type === "text-delta") {
-          set((s) => ({ response: s.response + part.textDelta }));
-        } else if (part.type === "reasoning") {
-          set((s) => ({ reasoning: s.reasoning + part.textDelta }));
-        }
-        // else → lo descartamos
+    for await (const part of stream as AsyncIterable<any>) {
+      if (typeof part === "string") {
+        set(s => ({ response: s.response + part }));
+      } else if (part.type === "text-delta") {
+        set(s => ({ response: s.response + part.textDelta }));
+      } else if (part.type === "reasoning") {
+        set(s => ({ reasoning: s.reasoning + part.textDelta }));
       }
+    }
     } catch {
       set({ response: "Error generating response" });
     } finally {
