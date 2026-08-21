@@ -43,8 +43,13 @@ export const createAiSlice: StateCreator<AiSlice> = (set, get) => ({
         set(s => ({ reasoning: s.reasoning + part.textDelta }));
       }
     }
-    } catch {
-      set({ response: "Error generating response" });
+    } catch (error) {
+      console.error("OpenRouter error:", error);
+      set({
+        response: error instanceof Error
+          ? error.message
+          : "Error generating response",
+      });
     } finally {
       set({ isGenerating: false });
     }
